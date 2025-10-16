@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 220 30% 7%;
+    --background: 220 30% 5%;
     --foreground: 0 0% 100%;
 
     --card: 218 35% 11%;
@@ -45,6 +45,9 @@ All colors MUST be HSL.
 
     --glow-primary: 217 100% 63%;
     --glow-secondary: 158 100% 50%;
+    
+    --gradient-dark: linear-gradient(135deg, #0C1F3F 0%, #1E4FC2 100%);
+    --gradient-glow: linear-gradient(135deg, #4C83FF 0%, #00FF9C 100%);
 
     --sidebar-background: 218 35% 11%;
     --sidebar-foreground: 0 0% 100%;
@@ -70,7 +73,12 @@ All colors MUST be HSL.
 
 @layer utilities {
   .glow-text {
-    text-shadow: 0 0 20px hsl(var(--glow-primary) / 0.5);
+    text-shadow: 0 0 20px hsl(var(--glow-primary) / 0.6),
+                 0 0 40px hsl(var(--glow-primary) / 0.4);
+  }
+  
+  .glow-text-secondary {
+    text-shadow: 0 0 20px hsl(var(--glow-secondary) / 0.6);
   }
   
   .glow-border {
@@ -79,6 +87,35 @@ All colors MUST be HSL.
   }
   
   .glow-card {
-    box-shadow: 0 0 40px hsl(var(--glow-primary) / 0.15);
+    box-shadow: 0 4px 24px hsl(var(--glow-primary) / 0.15),
+                0 0 60px hsl(var(--glow-primary) / 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .glow-card:hover {
+    box-shadow: 0 8px 32px hsl(var(--glow-primary) / 0.25),
+                0 0 80px hsl(var(--glow-primary) / 0.15);
+    transform: translateY(-4px);
+  }
+  
+  .glass-card {
+    background: rgba(12, 31, 63, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(76, 131, 255, 0.2);
+  }
+  
+  .gradient-text {
+    background: linear-gradient(135deg, #4C83FF 0%, #00FF9C 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-8px);
   }
 }

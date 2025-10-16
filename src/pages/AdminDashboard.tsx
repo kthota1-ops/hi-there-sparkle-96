@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Users, Target, Calendar, Store } from "lucide-react";
+import { Users, Target, Calendar, Store, TrendingUp, Activity } from "lucide-react";
 import Navbar from "@/components/dashboard/Navbar";
+import AdminSidebar from "@/components/dashboard/AdminSidebar";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
   const [profile, setProfile] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("overview");
   const [stats, setStats] = useState({
     totalStudents: 0,
     activeEvents: 0,
@@ -32,7 +33,6 @@ const AdminDashboard = () => {
       return;
     }
 
-    // Check if user is admin
     const { data: roleData } = await supabase
       .from("user_roles")
       .select("role")
@@ -55,7 +55,6 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async (userId: string) => {
     try {
-      // Fetch profile
       const { data: profileData } = await supabase
         .from("profiles")
         .select("*")
@@ -64,7 +63,6 @@ const AdminDashboard = () => {
 
       setProfile(profileData);
 
-      // Fetch stats
       const { count: studentsCount } = await supabase
         .from("profiles")
         .select("*", { count: "exact", head: true });
@@ -101,7 +99,10 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl glow-text">Loading admin dashboard...</p>
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-xl glow-text">Loading admin dashboard...</p>
+        </div>
       </div>
     );
   }
@@ -117,110 +118,139 @@ const AdminDashboard = () => {
         isAdmin
       />
 
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 glow-text">Admin Dashboard</h1>
+      <div className="flex">
+        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6 glow-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Students</p>
-                <p className="text-3xl font-bold text-primary">
-                  {stats.totalStudents}
-                </p>
-              </div>
-              <Users className="w-12 h-12 text-primary opacity-50" />
-            </div>
-          </Card>
-
-          <Card className="p-6 glow-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Active Events</p>
-                <p className="text-3xl font-bold text-secondary">
-                  {stats.activeEvents}
-                </p>
-              </div>
-              <Calendar className="w-12 h-12 text-secondary opacity-50" />
-            </div>
-          </Card>
-
-          <Card className="p-6 glow-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Total Coins Issued
-                </p>
-                <p className="text-3xl font-bold text-accent">
-                  {stats.totalCoinsIssued}
-                </p>
-              </div>
-              <Store className="w-12 h-12 text-accent opacity-50" />
-            </div>
-          </Card>
-
-          <Card className="p-6 glow-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Active Challenges
-                </p>
-                <p className="text-3xl font-bold text-foreground">
-                  {stats.activeChallenges}
-                </p>
-              </div>
-              <Target className="w-12 h-12 text-foreground opacity-50" />
-            </div>
-          </Card>
-        </div>
-
-        {/* Management Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="p-6 glow-card">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
-              Manage Students
-            </h2>
-            <p className="text-muted-foreground mb-4">
-              View, edit, and manage student profiles, ranks, and coins.
+        <main className="flex-1 p-8">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold glow-text mb-2">Admin Dashboard</h1>
+            <p className="text-muted-foreground">
+              Manage your GDSC community and track engagement
             </p>
-            <Button className="w-full glow-border">View Students</Button>
-          </Card>
+          </div>
 
-          <Card className="p-6 glow-card">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Target className="w-5 h-5 text-primary" />
-              Challenges
-            </h2>
-            <p className="text-muted-foreground mb-4">
-              Create and manage challenges with coin and XP rewards.
-            </p>
-            <Button className="w-full glow-border">Manage Challenges</Button>
-          </Card>
+          {/* Stats Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card className="p-6 glow-card hover-lift bg-gradient-to-br from-[#4285F4]/20 to-card">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Total Students
+                  </p>
+                  <p className="text-4xl font-bold glow-text">
+                    {stats.totalStudents}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    Active members
+                  </p>
+                </div>
+                <Users className="w-16 h-16 text-[#4285F4] opacity-50" />
+              </div>
+            </Card>
 
-          <Card className="p-6 glow-card">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary" />
-              Events
-            </h2>
-            <p className="text-muted-foreground mb-4">
-              Create, edit, and track GDSC events and RSVPs.
-            </p>
-            <Button className="w-full glow-border">Manage Events</Button>
-          </Card>
+            <Card className="p-6 glow-card hover-lift bg-gradient-to-br from-[#34A853]/20 to-card">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Active Events
+                  </p>
+                  <p className="text-4xl font-bold glow-text">
+                    {stats.activeEvents}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                    <Activity className="w-3 h-3" />
+                    Upcoming
+                  </p>
+                </div>
+                <Calendar className="w-16 h-16 text-[#34A853] opacity-50" />
+              </div>
+            </Card>
 
-          <Card className="p-6 glow-card">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Store className="w-5 h-5 text-primary" />
-              Shop Inventory
-            </h2>
-            <p className="text-muted-foreground mb-4">
-              Manage shop items, stock, and pricing.
-            </p>
-            <Button className="w-full glow-border">Manage Shop</Button>
-          </Card>
-        </div>
+            <Card className="p-6 glow-card hover-lift bg-gradient-to-br from-[#FBBC04]/20 to-card">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Coins Issued
+                  </p>
+                  <p className="text-4xl font-bold glow-text">
+                    {stats.totalCoinsIssued}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    In circulation
+                  </p>
+                </div>
+                <Store className="w-16 h-16 text-[#FBBC04] opacity-50" />
+              </div>
+            </Card>
+
+            <Card className="p-6 glow-card hover-lift bg-gradient-to-br from-[#EA4335]/20 to-card">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Challenges
+                  </p>
+                  <p className="text-4xl font-bold glow-text">
+                    {stats.activeChallenges}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                    <Activity className="w-3 h-3" />
+                    Available
+                  </p>
+                </div>
+                <Target className="w-16 h-16 text-[#EA4335] opacity-50" />
+              </div>
+            </Card>
+          </div>
+
+          {/* Management Sections */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="p-6 glow-card hover-lift">
+              <Users className="w-12 h-12 mb-4 text-[#4285F4]" />
+              <h3 className="text-xl font-bold mb-3">Manage Students</h3>
+              <p className="text-muted-foreground mb-4 text-sm">
+                View profiles, edit ranks, adjust coin balances, and track student progress.
+              </p>
+              <div className="text-sm text-muted-foreground">
+                Coming soon in Cloud dashboard
+              </div>
+            </Card>
+
+            <Card className="p-6 glow-card hover-lift">
+              <Target className="w-12 h-12 mb-4 text-[#EA4335]" />
+              <h3 className="text-xl font-bold mb-3">Challenges</h3>
+              <p className="text-muted-foreground mb-4 text-sm">
+                Create coding challenges with custom coin and XP rewards.
+              </p>
+              <div className="text-sm text-muted-foreground">
+                Coming soon in Cloud dashboard
+              </div>
+            </Card>
+
+            <Card className="p-6 glow-card hover-lift">
+              <Calendar className="w-12 h-12 mb-4 text-[#34A853]" />
+              <h3 className="text-xl font-bold mb-3">Events</h3>
+              <p className="text-muted-foreground mb-4 text-sm">
+                Organize workshops, hackathons, and track RSVPs.
+              </p>
+              <div className="text-sm text-muted-foreground">
+                Coming soon in Cloud dashboard
+              </div>
+            </Card>
+
+            <Card className="p-6 glow-card hover-lift">
+              <Store className="w-12 h-12 mb-4 text-[#FBBC04]" />
+              <h3 className="text-xl font-bold mb-3">Shop Inventory</h3>
+              <p className="text-muted-foreground mb-4 text-sm">
+                Manage merch items, pricing, and stock levels.
+              </p>
+              <div className="text-sm text-muted-foreground">
+                Coming soon in Cloud dashboard
+              </div>
+            </Card>
+          </div>
+        </main>
       </div>
     </div>
   );
